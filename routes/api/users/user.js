@@ -2,7 +2,7 @@ const express = require("express");
 
 const routes = express.Router();
 
-// const User = require("../../../model/user");
+const User = require("../../../model/user");
 
 const { check, validationResult } = require("express-validator");
 //load input validations
@@ -14,16 +14,20 @@ routes.get("/test", (req, res) => {
 
 routes.post(
   "/register",
-  check("name", "Name is required").notEmpty,
-  check("email", "Name is required").isEmail(),
-  check("Password", "Name is required").isLength({ min: 6 }),
   (req, res) => {
-    // const {errors, isValid} = registerInputValidations(req.body);
 
+    const { errors, isValid } = registerInputValidations(req.body);
+    console.log(errors, isValid)
+    
     if (!isValid) {
       return res.status(400).json(errors);
     } else {
-      const newUser = new User({
+      //if not using mongoose 
+      // function to insert data inside collection ?
+      // db.user.insert({----})
+       //db.user.insettMany([{},{},{},{}])
+       
+       const newUser = new User({ // document inside collection in mongo db
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
@@ -32,10 +36,9 @@ routes.post(
 
       newUser
         .save()
-        .then((user) => req.json(user))
+        .then((user) => res.json(user))
         .catch((err) => console.log(err));
 
-      //return res.json(req.body);
     }
   }
 );
